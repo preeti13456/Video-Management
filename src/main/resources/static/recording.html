@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Record Video</title>
+</head>
+<body>
+<h1>Record Video</h1>
+<video id="preview" autoplay></video>
+<button id="start">Start</button>
+<button id="stop">Stop</button>
+<button id="upload">Upload</button>
+
+<script>
+    let mediaRecorder, recordedBlobs;
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            document.getElementById('preview').srcObject = stream;
+            mediaRecorder = new MediaRecorder(stream);
+            recordedBlobs = [];
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) recordedBlobs.push(event.data);
+            };
+        });
+
+    document.getElementById('start').onclick = () => mediaRecorder.start();
+    document.getElementById('stop').onclick = () => mediaRecorder.stop();
+    document.getElementById('upload').onclick = () => {
+        const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+        const formData = new FormData();
+        formData.append('file', blob, 'video.webm');
+        fetch('/api/videos/record', { method: 'POST', body: formData });
+    };
+</script>
+</body>
+</html>

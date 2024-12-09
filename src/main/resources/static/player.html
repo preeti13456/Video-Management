@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Video</title>
+</head>
+<body>
+<h1>Play Video</h1>
+<video id="player" controls></video>
+<select id="videoSelector"></select>
+<button onclick="playVideo()">Play</button>
+
+<script>
+    const videoSelector = document.getElementById('videoSelector');
+    const player = document.getElementById('player');
+
+    fetch('/api/videos')
+        .then(response => response.json())
+        .then(videos => {
+            videos.forEach(video => {
+                const option = document.createElement('option');
+                option.value = video.name;
+                option.text = video.name;
+                videoSelector.appendChild(option);
+            });
+        });
+
+    function playVideo() {
+        const videoName = videoSelector.value;
+        player.src = `/api/videos/${videoName}`;
+    }
+</script>
+</body>
+</html>
